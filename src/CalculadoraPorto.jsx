@@ -1,48 +1,39 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
 export default function CalculadoraPorto() {
-  // Benefício: Gasolina
+  // Controla a aba ativa: "gasolina" ou "renovacao"
+  const [activeTab, setActiveTab] = useState("gasolina");
+
+  // Estados para Benefício: Gasolina
   const [gastoMensal, setGastoMensal] = useState(500);
   const [precoLitro, setPrecoLitro] = useState(5.5);
-  const [desconto, setDesconto] = useState(15);
+  const [descontoGasolina, setDescontoGasolina] = useState(15);
   const [mensagem, setMensagem] = useState("");
 
-  // Benefício: Desconto na Renovação
+  // Cálculos para benefício Gasolina
+  const litros = gastoMensal / precoLitro;
+  const economiaMensal = litros * (descontoGasolina / 100);
+  const economiaAnual = economiaMensal * 12;
+
+  // Estados para Benefício: Desconto na Renovação
   const [premioTotal, setPremioTotal] = useState(3000);
   const [porcentagemDesconto, setPorcentagemDesconto] = useState(10);
-  const [valorComDesconto, setValorComDesconto] = useState(null);
+  const valorComDesconto = (premioTotal * (1 - porcentagemDesconto / 100)).toFixed(2);
 
-  const calcular = () => {
-    const litros = gastoMensal / precoLitro;
-    const economiaMensal = litros * (desconto / 100);
-    const economiaAnual = economiaMensal * 12;
-
+  // Gera mensagem para copiar via clipboard
+  const calcularMensagem = () => {
     const msg = `
-🚗 *Simulação de Economia com o Cartão Porto Seguro*:
+🚗 Benefício: Gasolina
+- Gasto mensal: R$ ${gastoMensal.toFixed(2)}
+- Preço por litro: R$ ${precoLitro.toFixed(2)}
+- Desconto: ${descontoGasolina} centavos
+- Litros abastecidos: ${litros.toFixed(2)}
+- Economia mensal: R$ ${economiaMensal.toFixed(2)}
+- Economia anual: R$ ${economiaAnual.toFixed(2)}
 
-📍 *Benefício: Gasolina*
-- Gasto mensal com combustível: R$ ${gastoMensal.toFixed(2)}
-- Preço médio por litro: R$ ${precoLitro.toFixed(2)}
-- Desconto aplicado: ${desconto} centavos por litro
-
-📊 Você abastece cerca de *${litros.toFixed(2)} litros/mês*
-💰 Economia mensal: *R$ ${economiaMensal.toFixed(2)}*
-💸 Economia anual: *R$ ${economiaAnual.toFixed(2)}*
-
-Além disso, o cartão oferece:
-✅ Connect Car gratuito
-✅ Até 15% de desconto na renovação do seu seguro
-
-Quer que eu te ajude a solicitar o seu? 😉
+Além disso, o cartão oferece até 15% de desconto na renovação do seguro!
     `;
-
     setMensagem(msg);
-  };
-
-  const calcularDescontoRenovacao = () => {
-    const descontoReais = (premioTotal * porcentagemDesconto) / 100;
-    const valorFinal = premioTotal - descontoReais;
-    setValorComDesconto(valorFinal.toFixed(2));
   };
 
   const copiarMensagem = () => {
@@ -51,88 +42,160 @@ Quer que eu te ajude a solicitar o seu? 😉
   };
 
   return (
-    <div className="max-w-xl mx-auto p-6 space-y-6 bg-gray-800 rounded-xl shadow-lg">
-      <h1 className="text-3xl font-bold text-blue-400">🧮 Calculadora - Cartão Porto Seguro</h1>
+    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+      <div className="w-full max-w-4xl bg-gray-800 rounded-xl shadow-2xl p-6">
+        <h1 className="text-3xl font-extrabold text-blue-400 text-center mb-8">
+          🧮 Calculadora - Cartão Porto Seguro
+        </h1>
 
-      {/* Benefício: Gasolina */}
-      <div className="space-y-4 bg-gray-900 p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold text-white">⛽ Benefício: Gasolina</h2>
-        <div>
-          <label className="block text-gray-400">Gasto mensal com combustível (R$)</label>
-          <input
-            type="number"
-            value={gastoMensal}
-            onChange={(e) => setGastoMensal(Number(e.target.value))}
-          />
+        {/* Abas para alternar entre os benefícios */}
+        <div className="flex justify-center mb-8 space-x-4">
+          <button
+            onClick={() => setActiveTab("gasolina")}
+            className={`px-4 py-2 rounded-full font-semibold transition duration-200 focus:outline-none ${
+              activeTab === "gasolina"
+                ? "bg-blue-600 text-white shadow-lg"
+                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+            }`}
+          >
+            ⛽ Gasolina
+          </button>
+          <button
+            onClick={() => setActiveTab("renovacao")}
+            className={`px-4 py-2 rounded-full font-semibold transition duration-200 focus:outline-none ${
+              activeTab === "renovacao"
+                ? "bg-blue-600 text-white shadow-lg"
+                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+            }`}
+          >
+            📉 Renovação
+          </button>
         </div>
-        <div>
-          <label className="block text-gray-400">Preço médio por litro (R$)</label>
-          <input
-            type="number"
-            value={precoLitro}
-            onChange={(e) => setPrecoLitro(Number(e.target.value))}
-          />
-        </div>
-        <div>
-          <label className="block text-gray-400">Desconto por litro (centavos)</label>
-          <input
-            type="number"
-            value={desconto}
-            onChange={(e) => setDesconto(Number(e.target.value))}
-          />
-        </div>
-        <button
-          onClick={calcular}
-          className="w-full text-lg font-semibold"
-        >
-          🚀 Calcular Economia
-        </button>
-      </div>
 
-      {/* Benefício: Desconto na Renovação */}
-      <div className="space-y-4 bg-gray-900 p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold text-white">📉 Benefício: Desconto na Renovação</h2>
-        <div>
-          <label className="block text-gray-400">Prêmio total do seguro (R$)</label>
-          <input
-            type="number"
-            value={premioTotal}
-            onChange={(e) => setPremioTotal(Number(e.target.value))}
-          />
-        </div>
-        <div>
-          <label className="block text-gray-400">Porcentagem de desconto (%)</label>
-          <input
-            type="number"
-            value={porcentagemDesconto}
-            onChange={(e) => setPorcentagemDesconto(Number(e.target.value))}
-          />
-        </div>
-        <button
-          onClick={calcularDescontoRenovacao}
-          className="w-full text-lg font-semibold"
-        >
-          🎯 Calcular Valor com Desconto
-        </button>
-        {valorComDesconto && (
-          <div className="text-white">
-            💵 Valor com desconto: <strong>R$ {valorComDesconto}</strong>
+        {activeTab === "gasolina" && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-gray-300 mb-1">
+                  Gasto mensal (R$)
+                </label>
+                <input
+                  type="number"
+                  value={gastoMensal}
+                  onChange={(e) => setGastoMensal(Number(e.target.value))}
+                  className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-300 mb-1">
+                  Preço por litro (R$)
+                </label>
+                <input
+                  type="number"
+                  value={precoLitro}
+                  onChange={(e) => setPrecoLitro(Number(e.target.value))}
+                  className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-gray-300 mb-1">
+                  Desconto por litro (centavos)
+                </label>
+                <input
+                  type="number"
+                  value={descontoGasolina}
+                  onChange={(e) => setDescontoGasolina(Number(e.target.value))}
+                  className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button
+                onClick={calcularMensagem}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition duration-200"
+              >
+                🚀 Calcular Economia
+              </button>
+              <button
+                onClick={copiarMensagem}
+                className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition duration-200"
+              >
+                📋 Copiar Mensagem
+              </button>
+            </div>
+
+            {mensagem && (
+              <div className="p-4 bg-gray-700 rounded-lg text-sm font-mono whitespace-pre-wrap border border-gray-600">
+                {mensagem}
+              </div>
+            )}
+
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+              <div className="p-4 bg-gray-800 rounded-lg">
+                <div className="text-xl font-bold text-green-400">
+                  R$ {economiaMensal.toFixed(2)}
+                </div>
+                <div className="text-sm text-gray-400">Mensal</div>
+              </div>
+              <div className="p-4 bg-gray-800 rounded-lg">
+                <div className="text-xl font-bold text-green-400">
+                  R$ {economiaAnual.toFixed(2)}
+                </div>
+                <div className="text-sm text-gray-400">Anual</div>
+              </div>
+              <div className="p-4 bg-gray-800 rounded-lg">
+                <div className="text-xl font-bold text-green-400">
+                  {litros.toFixed(2)} L
+                </div>
+                <div className="text-sm text-gray-400">Abastecidos</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "renovacao" && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-gray-300 mb-1">
+                  Prêmio total (R$)
+                </label>
+                <input
+                  type="number"
+                  value={premioTotal}
+                  onChange={(e) => setPremioTotal(Number(e.target.value))}
+                  className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-300 mb-1">
+                  Desconto (%)
+                </label>
+                <input
+                  type="number"
+                  value={porcentagemDesconto}
+                  onChange={(e) => setPorcentagemDesconto(Number(e.target.value))}
+                  className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+            <button
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition duration-200"
+            >
+              🔥 Calcular Valor com Desconto
+            </button>
+
+            <div className="mt-4 p-4 bg-gray-800 rounded-lg text-center text-xl font-semibold">
+              💵 Valor com desconto:{" "}
+              <span className="text-green-400">R$ {valorComDesconto}</span>
+            </div>
           </div>
         )}
       </div>
-
-      {/* Resultado da simulação de economia */}
-      {mensagem && (
-        <div className="bg-gray-700 p-6 rounded-lg shadow-md space-y-4">
-          <pre className="whitespace-pre-wrap font-mono text-sm bg-gray-800 p-4 rounded">{mensagem}</pre>
-          <button
-            onClick={copiarMensagem}
-            className="border border-gray-500 w-full py-2 rounded-lg hover:bg-gray-600"
-          >
-            📋 Copiar mensagem para WhatsApp
-          </button>
-        </div>
-      )}
     </div>
   );
 }
+
+export default CalculadoraPorto;
