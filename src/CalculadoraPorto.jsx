@@ -1,26 +1,21 @@
 import React, { useState } from "react";
 
 export default function CalculadoraPorto() {
-  // Controla a aba ativa: "gasolina" ou "renovacao"
   const [activeTab, setActiveTab] = useState("gasolina");
 
-  // Estados para Benefício: Gasolina
   const [gastoMensal, setGastoMensal] = useState(500);
   const [precoLitro, setPrecoLitro] = useState(5.5);
   const [descontoGasolina, setDescontoGasolina] = useState(15);
   const [mensagem, setMensagem] = useState("");
 
-  // Cálculos para benefício Gasolina
   const litros = gastoMensal / precoLitro;
   const economiaMensal = litros * (descontoGasolina / 100);
   const economiaAnual = economiaMensal * 12;
 
-  // Estados para Benefício: Desconto na Renovação
   const [premioTotal, setPremioTotal] = useState(3000);
   const [porcentagemDesconto, setPorcentagemDesconto] = useState(10);
   const valorComDesconto = (premioTotal * (1 - porcentagemDesconto / 100)).toFixed(2);
 
-  // Gera mensagem para copiar via clipboard
   const calcularMensagem = () => {
     const msg = `
 🚗 Benefício: Gasolina
@@ -31,8 +26,7 @@ export default function CalculadoraPorto() {
 - Economia mensal: R$ ${economiaMensal.toFixed(2)}
 - Economia anual: R$ ${economiaAnual.toFixed(2)}
 
-Além disso, o cartão oferece até 15% de desconto na renovação do seguro!
-    `;
+Além disso, o cartão oferece até 15% de desconto na renovação do seguro!`;
     setMensagem(msg);
   };
 
@@ -48,7 +42,6 @@ Além disso, o cartão oferece até 15% de desconto na renovação do seguro!
           🧮 Calculadora - Cartão Porto Seguro
         </h1>
 
-        {/* Abas para alternar entre os benefícios */}
         <div className="flex justify-center mb-8 space-x-4">
           <button
             onClick={() => setActiveTab("gasolina")}
@@ -188,8 +181,7 @@ Além disso, o cartão oferece até 15% de desconto na renovação do seguro!
             </button>
 
             <div className="mt-4 p-4 bg-gray-800 rounded-lg text-center text-xl font-semibold">
-              💵 Valor com desconto:{" "}
-              <span className="text-green-400">R$ {valorComDesconto}</span>
+              💵 Valor com desconto: <span className="text-green-400">R$ {valorComDesconto}</span>
             </div>
           </div>
         )}
@@ -197,5 +189,3 @@ Além disso, o cartão oferece até 15% de desconto na renovação do seguro!
     </div>
   );
 }
-
-export default CalculadoraPorto;
